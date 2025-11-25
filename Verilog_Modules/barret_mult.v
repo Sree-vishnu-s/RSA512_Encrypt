@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 //////////////////////////////////////////////////////////////////////////////////
-// Barrett Modular Multiplier - BUG FIXED VERSION
+// Barrett Modular Multiplier - COMPLETELY COMBINATIONAL
 // Matches IEEE paper exactly
 //////////////////////////////////////////////////////////////////////////////////
 
@@ -11,7 +11,7 @@ module barrett_mult  (
     input  wire [255:0] a,
     input  wire [255:0] b,
     input  wire [255:0] n,
-    output reg  [255:0] r,
+    output wire  [255:0] r,
     output reg          valid
 );
 
@@ -136,40 +136,7 @@ module barrett_mult  (
     
     // Final result
     assign r_final = r_temp2;
-
-    //---------------------------------------------
-    // Simple FSM
-    //---------------------------------------------
-    always @(posedge clk or posedge rst) begin
-        if (rst) begin
-            state <= IDLE;
-            valid <= 1'b0;
-            r <= 256'd0;
-        end 
-        else begin
-            case (state)
-                IDLE: begin
-                    valid <= 1'b0;
-                    if (en) begin
-                        state <= CALC;
-                    end
-                end
-
-                CALC: begin
-                    r <= r_final;
-                    state <= DONE;
-                end
-
-                DONE: begin
-                    valid <= 1'b1;
-                    if (!en) begin
-                        state <= IDLE;
-                    end
-                end
-
-                default: state <= IDLE;
-            endcase
-        end
-    end
+    assign r = r_temp2;
+    
 
 endmodule
